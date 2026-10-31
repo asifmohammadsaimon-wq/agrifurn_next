@@ -171,34 +171,53 @@ export default function HomePage() {
     let activeCategory = "all";
 
     function renderProducts() {
-      const query = searchInput.value.trim().toLowerCase();
-      const visibleProducts = query
-        ? products.filter((product) => product.name.toLowerCase().includes(query))
-        : products.filter((product) => activeCategory === "all" || product.category === activeCategory);
-      productGrid.innerHTML = "";
+      const query = searchInput.value.toLowerCase();
+      let visibleProducts = products;
+
+      if (query !== "") {
+        visibleProducts = products.filter(function (product) {
+          return product.name.toLowerCase().includes(query);
+        });
+      }
+
+      if (activeCategory !== "all") {
+        visibleProducts = visibleProducts.filter(function (product) {
+          return product.category === activeCategory;
+        });
+      }
+
       if (visibleProducts.length > 0) {
-        for (const product of visibleProducts) {
+        productGrid.innerHTML = "";
+
+        for (let i = 0; i < visibleProducts.length; i++) {
+          const product = visibleProducts[i];
           productGrid.innerHTML += `
             <article class="product-card">
-              <div class="product-image"><img src="${product.image}" alt="${product.name}"></div>
+              <div class="product-image">
+                <img src="${product.image}" alt="${product.name}">
+              </div>
+
               <div class="product-info">
                 <p class="product-category">${product.type}</p>
                 <h3 class="product-name">${product.name}</h3>
                 <h1>*****</h1>
+
                 <div class="product-bottom">
                   <p class="price">${product.price}</p>
                   <button class="add" type="button">+</button>
                 </div>
               </div>
-            </article>`;
+            </article>
+          `;
         }
       } else {
         productGrid.innerHTML = "<h2>No products found.</h2>";
       }
     }
+
     renderProducts();
 
-  const onFilterClick = (event) => {
+    const onFilterClick = (event) => {
   const selectedFilter = event.target.closest(".filter");
 
   if (!selectedFilter) return;
@@ -231,8 +250,6 @@ export default function HomePage() {
       cartCount.textContent = cart;
     };
   
-
-
     const onSearch = () => renderProducts();
     const onSubmit = (event) => {
       event.preventDefault();
